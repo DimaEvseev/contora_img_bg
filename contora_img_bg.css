@@ -1,0 +1,23 @@
+.preloader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #333;
+    transition: all 0.2s ease-out;
+    -webkit-transition: all 0.2s ease-out;
+}
+.preloader_container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -50px 0 0 -50px;
+    width: 100px;
+    height: 100px;
+    background: url("ajax-loader.gif") 50% no-repeat;
+}
+.preloader.loaded {
+    opacity: 0;
+    visibility: hidden;
+}

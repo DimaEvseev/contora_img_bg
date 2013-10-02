@@ -1,0 +1,108 @@
+<?php
+/**
+ * Implements hook_field_formatter_info().
+ */
+function contora_img_bg_field_formatter_info() {
+  return array(
+    'contora_img_bg' => array(
+
+      'label' => t('Background'),
+      'field types' => array('image'),
+      'settings' =>  array(
+          'class' => null,
+          'imagecatch'=> 'large',
+          'preload' => 0,
+          //'height'=>100,
+          //'width' =>100,
+
+      )
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function contora_img_bg_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $element = array();
+
+  $element['class'] = array(
+    '#title' => t('CSS класс'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['class'],
+  );
+
+/*  $element['height'] = array(
+    '#title' => t('Высота'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['height'],
+  );
+
+  $element['width'] = array(
+    '#title' => t('ширина'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['width'],
+  );*/
+
+  //Селект для стилей отображения.
+  foreach(image_styles() as $style_name => $style) {
+    $options[$style_name] = $style_name;
+  }
+
+  $element['imagecatch'] = array(
+    '#title' => t('Стить для фоновой картинки'),
+    '#type' => 'select',
+    '#options' => $options,
+    '#default_value' => $settings['imagecatch'],
+  );
+
+  $element['preload'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use preload for this field'),
+    '#default_value' => $settings['preload'],
+  );
+
+  return $element;
+}
+
+function contora_img_bg_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $summary = t('TODO: generate settings list');
+  return $summary;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function contora_img_bg_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $settings = $display['settings'];
+
+  switch ($display['type']) {
+    case 'contora_img_bg':
+      foreach($items as $delta =>$item) {
+        $path = image_style_url($settings['imagecatch'], $item['uri']);
+        if ($settings['preload']) {
+          $element[$delta] = array(
+            '#markup'  => '<div class="bg-preload ' . $settings['class'] . '" data-url="' . $path . '"></div>',
+          );
+        } else {
+          $element[$delta] = array(
+            '#markup'  => '<div class="' . $settings['class'] . '" style="background-image: url(' . $path . ');"></div>',
+          );
+        }
+      }
+      break;
+  }
+
+  if ($settings['preload']) {
+    drupal_add_js(drupal_get_path('module', 'contora_img_bg') . '/jquery.images.js');
+    drupal_add_js(drupal_get_path('module', 'contora_img_bg') . '/contora_img_bg.js');
+    drupal_add_css(drupal_get_path('module', 'contora_img_bg') . '/contora_img_bg.css');
+  };
+
+  return $element;
+}

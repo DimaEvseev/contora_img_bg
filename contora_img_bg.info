@@ -1,0 +1,8 @@
+name = Image backgound formater
+core = 7.x
+description = Formater for display image in block backgound
+package = Contorra theme suport
+version = "7.x-1.5"
+core = "7.x"
+
+
