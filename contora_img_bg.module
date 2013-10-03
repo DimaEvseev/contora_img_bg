@@ -9,11 +9,12 @@ function contora_img_bg_field_formatter_info() {
       'label' => t('Background'),
       'field types' => array('image'),
       'settings' =>  array(
-          'class' => null,
-          'imagecatch'=> 'large',
-          'preload' => 0,
-          //'height'=>100,
-          //'width' =>100,
+        'class' => null,
+        'imagecatch'=> 'large',
+        'preload' => 0,
+        'slide' => 0,
+        //'height'=>100,
+        //'width' =>100,
 
       )
     ),
@@ -36,17 +37,17 @@ function contora_img_bg_field_formatter_settings_form($field, $instance, $view_m
     '#default_value' => $settings['class'],
   );
 
-/*  $element['height'] = array(
-    '#title' => t('Высота'),
-    '#type' => 'textfield',
-    '#default_value' => $settings['height'],
-  );
+  /*  $element['height'] = array(
+      '#title' => t('Высота'),
+      '#type' => 'textfield',
+      '#default_value' => $settings['height'],
+    );
 
-  $element['width'] = array(
-    '#title' => t('ширина'),
-    '#type' => 'textfield',
-    '#default_value' => $settings['width'],
-  );*/
+    $element['width'] = array(
+      '#title' => t('ширина'),
+      '#type' => 'textfield',
+      '#default_value' => $settings['width'],
+    );*/
 
   //Селект для стилей отображения.
   foreach(image_styles() as $style_name => $style) {
@@ -64,6 +65,12 @@ function contora_img_bg_field_formatter_settings_form($field, $instance, $view_m
     '#type' => 'checkbox',
     '#title' => t('Use preload for this field'),
     '#default_value' => $settings['preload'],
+  );
+
+  $element['slide'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Preload this as slide'),
+    '#default_value' => $settings['slide'],
   );
 
   return $element;
@@ -86,8 +93,13 @@ function contora_img_bg_field_formatter_view($entity_type, $entity, $field, $ins
       foreach($items as $delta =>$item) {
         $path = image_style_url($settings['imagecatch'], $item['uri']);
         if ($settings['preload']) {
+          $class = 'bg-preload';
+
+          if ($settings['slide']) $class .= ' bg-slide';
+          if ($settings['class']) $class .= ' ' . $settings['class'];
+
           $element[$delta] = array(
-            '#markup'  => '<div class="bg-preload ' . $settings['class'] . '" data-url="' . $path . '"></div>',
+            '#markup'  => '<div class="' . $class . '" data-url="' . $path . '" data-id="' . $settings['imagecatch'] . '_' . $item['fid']  . '"></div>',
           );
         } else {
           $element[$delta] = array(
@@ -98,11 +110,11 @@ function contora_img_bg_field_formatter_view($entity_type, $entity, $field, $ins
       break;
   }
 
-  if ($settings['preload']) {
-    drupal_add_js(drupal_get_path('module', 'contora_img_bg') . '/jquery.images.js');
-    drupal_add_js(drupal_get_path('module', 'contora_img_bg') . '/contora_img_bg.js');
-    drupal_add_css(drupal_get_path('module', 'contora_img_bg') . '/contora_img_bg.css');
-  };
-
   return $element;
+}
+
+function contora_img_bg_init () {
+  drupal_add_js(drupal_get_path('module', 'contora_img_bg') . '/jquery.images.js');
+  drupal_add_js(drupal_get_path('module', 'contora_img_bg') . '/contora_img_bg.js');
+  drupal_add_css(drupal_get_path('module', 'contora_img_bg') . '/contora_img_bg.css');
 }
